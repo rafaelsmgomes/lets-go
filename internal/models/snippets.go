@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"time"
-
-	"golang.org/x/tools/go/analysis/passes/defers"
 )
 
 type Snippet struct {
