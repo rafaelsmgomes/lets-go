@@ -25,6 +25,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 		files := []string{
 			"./ui/html/base.tmpl",
 			"./ui/html/partials/nav.tmpl",
+			page,
 		}
 
 		ts, err := template.ParseFiles(files...)
