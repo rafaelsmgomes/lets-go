@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -51,6 +52,7 @@ func main() {
 	sessioManager := scs.New()
 	sessioManager.Store = mysqlstore.New(db)
 	sessioManager.Lifetime = 12 * time.Hour
+	sessioManager.Cookie.Secure = true
 
 	app := &application{
 		errorLog:      errorLog,
@@ -61,14 +63,19 @@ func main() {
 		sessioManager: sessioManager,
 	}
 
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
 	srv := &http.Server{
-		Addr:     *addr,
-		ErrorLog: errorLog,
-		Handler:  app.routes(),
+		Addr:      *addr,
+		ErrorLog:  errorLog,
+		Handler:   app.routes(),
+		TLSConfig: tlsConfig,
 	}
 
 	infoLog.Printf("Starting server on port %s", *addr)
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	errorLog.Fatal(err)
 }
 
